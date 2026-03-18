@@ -32,7 +32,7 @@ fun ProductionScreen() {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Default.Add, contentDescription = "鏂板缓鐢熶骇")
+                Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
     ) { paddingValues ->
@@ -84,24 +84,23 @@ fun ProductionOrderItem(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("璁㈠崟鍙? ${order.orderNo}", style = MaterialTheme.typography.titleMedium)
+                Text("Order: ${order.orderNo}", style = MaterialTheme.typography.titleMedium)
                 ProductionStatusChip(order.status)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text("浜у搧: ${order.productName}")
-            Text("璁″垝鏁伴噺: ${order.plannedQuantity}")
-            Text("瀹屾垚鏁伴噺: ${order.completedQuantity}")
-            Text("寮€濮嬫棩鏈? ${dateFormat.format(Date(order.startDate))}")
+            Text("Product: ${order.productName}")
+            Text("Planned: ${order.plannedQuantity}")
+            Text("Completed: ${order.completedQuantity}")
+            Text("Start: ${dateFormat.format(Date(order.startDate))}")
             order.endDate?.let {
-                Text("缁撴潫鏃ユ湡: ${dateFormat.format(Date(it))}")
+                Text("End: ${dateFormat.format(Date(it))}")
             }
             if (order.remark.isNotEmpty()) {
-                Text("澶囨敞: ${order.remark}")
+                Text("Note: ${order.remark}")
             }
 
             Spacer(modifier = Modifier.height(8.dp))
             
-            // Progress bar
             LinearProgressIndicator(
                 progress = progress / 100f,
                 modifier = Modifier.fillMaxWidth()
@@ -113,19 +112,19 @@ fun ProductionOrderItem(
             Row {
                 if (order.status == "planned") {
                     TextButton(onClick = { onStatusChange("in_progress", order.completedQuantity) }) {
-                        Text("寮€濮嬬敓浜?)
+                        Text("Start")
                     }
                 }
                 if (order.status == "in_progress") {
                     TextButton(onClick = { 
                         onStatusChange("completed", order.plannedQuantity)
                     }) {
-                        Text("瀹屾垚")
+                        Text("Complete")
                     }
                 }
                 if (order.status != "completed" && order.status != "cancelled") {
                     TextButton(onClick = { onStatusChange("cancelled", order.completedQuantity) }) {
-                        Text("鍙栨秷")
+                        Text("Cancel")
                     }
                 }
             }
@@ -136,10 +135,10 @@ fun ProductionOrderItem(
 @Composable
 fun ProductionStatusChip(status: String) {
     val (color, text) = when (status) {
-        "planned" -> Pair(MaterialTheme.colorScheme.secondary, "璁″垝涓?)
-        "in_progress" -> Pair(MaterialTheme.colorScheme.primary, "鐢熶骇涓?)
-        "completed" -> Pair(MaterialTheme.colorScheme.primary, "宸插畬鎴?)
-        "cancelled" -> Pair(MaterialTheme.colorScheme.error, "宸插彇娑?)
+        "planned" -> Pair(MaterialTheme.colorScheme.secondary, "Planned")
+        "in_progress" -> Pair(MaterialTheme.colorScheme.primary, "In Progress")
+        "completed" -> Pair(MaterialTheme.colorScheme.primary, "Completed")
+        "cancelled" -> Pair(MaterialTheme.colorScheme.error, "Cancelled")
         else -> Pair(MaterialTheme.colorScheme.tertiary, status)
     }
     Surface(color = color.copy(alpha = 0.1f), shape = MaterialTheme.shapes.small) {
@@ -165,13 +164,13 @@ fun AddProductionOrderDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("鏂板缓鐢熶骇璁㈠崟") },
+        title = { Text("New Production Order") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
                     value = orderNo,
                     onValueChange = { orderNo = it },
-                    label = { Text("璁㈠崟鍙?) },
+                    label = { Text("Order No") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -181,10 +180,10 @@ fun AddProductionOrderDialog(
                     onExpandedChange = { productExpanded = it }
                 ) {
                     OutlinedTextField(
-                        value = selectedProduct?.name ?: "閫夋嫨浜у搧",
+                        value = selectedProduct?.name ?: "Select Product",
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("浜у搧") },
+                        label = { Text("Product") },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = productExpanded) },
                         modifier = Modifier.menuAnchor().fillMaxWidth()
                     )
@@ -207,7 +206,7 @@ fun AddProductionOrderDialog(
                 OutlinedTextField(
                     value = plannedQuantity,
                     onValueChange = { plannedQuantity = it },
-                    label = { Text("璁″垝鏁伴噺 *") },
+                    label = { Text("Planned Quantity") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -215,7 +214,7 @@ fun AddProductionOrderDialog(
                 OutlinedTextField(
                     value = remark,
                     onValueChange = { remark = it },
-                    label = { Text("澶囨敞") },
+                    label = { Text("Note") },
                     modifier = Modifier.fillMaxWidth(),
                     maxLines = 3
                 )
@@ -238,12 +237,12 @@ fun AddProductionOrderDialog(
                 },
                 enabled = selectedProductId != null && plannedQuantity.toDoubleOrNull() != null
             ) {
-                Text("淇濆瓨")
+                Text("Save")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("鍙栨秷")
+                Text("Cancel")
             }
         }
     )
