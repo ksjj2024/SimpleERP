@@ -106,7 +106,7 @@ fun ProductionOrderItem(
                 progress = progress / 100f,
                 modifier = Modifier.fillMaxWidth()
             )
-            Text("$progress%", style = MaterialTheme.typography.bodySmall)
+            Text("${progress}%", style = MaterialTheme.typography.bodySmall)
 
             Spacer(modifier = Modifier.height(8.dp))
             
