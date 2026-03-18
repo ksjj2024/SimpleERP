@@ -42,7 +42,7 @@ fun DashboardScreen(navController: NavHostController) {
     ) {
         item {
             Text(
-                "欢迎使用 SimpleERP",
+                "娆㈣繋浣跨敤 SimpleERP",
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -54,14 +54,14 @@ fun DashboardScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DashboardCard(
-                    title = "商品数量",
+                    title = "鍟嗗搧鏁伴噺",
                     value = productCount.toString(),
                     icon = Icons.Default.Inventory,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("products") }
                 )
                 DashboardCard(
-                    title = "客户数量",
+                    title = "瀹㈡埛鏁伴噺",
                     value = customerCount.toString(),
                     icon = Icons.Default.People,
                     modifier = Modifier.weight(1f),
@@ -76,15 +76,15 @@ fun DashboardScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DashboardCard(
-                    title = "库存商品",
+                    title = "搴撳瓨鍟嗗搧",
                     value = inventoryCount.toString(),
                     icon = Icons.Default.Warehouse,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("inventory") }
                 )
                 DashboardCard(
-                    title = "销售总额",
-                    value = "¥${String.format("%.2f", totalSales)}",
+                    title = "閿€鍞€婚",
+                    value = "楼${String.format("%.2f", totalSales)}",
                     icon = Icons.Default.AttachMoney,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("sales") }
@@ -94,7 +94,7 @@ fun DashboardScreen(navController: NavHostController) {
 
         item {
             Text(
-                "快捷操作",
+                "蹇嵎鎿嶄綔",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -106,7 +106,7 @@ fun DashboardScreen(navController: NavHostController) {
 
         item {
             Text(
-                "系统信息",
+                "绯荤粺淇℃伅",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -118,14 +118,15 @@ fun DashboardScreen(navController: NavHostController) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("SimpleERP v1.0")
-                    Text("单机版 - 数据存储在本地")
-                    Text("支持：进销存、财务、生产、报表")
+                    Text("鍗曟満鐗?- 鏁版嵁瀛樺偍鍦ㄦ湰鍦?)
+                    Text("鏀寔锛氳繘閿€瀛樸€佽储鍔°€佺敓浜с€佹姤琛?)
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardCard(
     title: String,
@@ -155,12 +156,12 @@ fun DashboardCard(
 @Composable
 fun QuickActionGrid(navController: NavHostController) {
     val actions = listOf(
-        Triple("新建采购", Icons.Default.ShoppingCart) { navController.navigate("purchase") },
-        Triple("新建销售", Icons.Default.PointOfSale) { navController.navigate("sales") },
-        Triple("添加商品", Icons.Default.Add) { navController.navigate("products") },
-        Triple("添加客户", Icons.Default.PersonAdd) { navController.navigate("customers") },
-        Triple("库存查询", Icons.Default.Search) { navController.navigate("inventory") },
-        Triple("财务报表", Icons.Default.BarChart) { navController.navigate("reports") }
+        Triple("鏂板缓閲囪喘", Icons.Default.ShoppingCart) { navController.navigate("purchase") },
+        Triple("鏂板缓閿€鍞?, Icons.Default.PointOfSale) { navController.navigate("sales") },
+        Triple("娣诲姞鍟嗗搧", Icons.Default.Add) { navController.navigate("products") },
+        Triple("娣诲姞瀹㈡埛", Icons.Default.PersonAdd) { navController.navigate("customers") },
+        Triple("搴撳瓨鏌ヨ", Icons.Default.Search) { navController.navigate("inventory") },
+        Triple("璐㈠姟鎶ヨ〃", Icons.Default.BarChart) { navController.navigate("reports") }
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
