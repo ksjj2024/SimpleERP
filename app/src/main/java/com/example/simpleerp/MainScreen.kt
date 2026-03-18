@@ -6,6 +6,8 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -14,16 +16,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.simpleerp.ui.screens.*
 
 sealed class Screen(val route: String, val title: String, val icon: @Composable () -> Unit) {
-    object Dashboard : Screen("dashboard", "首页", { Icon(Icons.Default.Home, null) })
-    object Products : Screen("products", "商品管理", { Icon(Icons.Default.Inventory, null) })
-    object Customers : Screen("customers", "客户管理", { Icon(Icons.Default.People, null) })
-    object Suppliers : Screen("suppliers", "供应商管理", { Icon(Icons.Default.LocalShipping, null) })
-    object Purchase : Screen("purchase", "采购管理", { Icon(Icons.Default.ShoppingCart, null) })
-    object Sales : Screen("sales", "销售管理", { Icon(Icons.Default.PointOfSale, null) })
-    object Inventory : Screen("inventory", "库存管理", { Icon(Icons.Default.Warehouse, null) })
-    object Finance : Screen("finance", "财务管理", { Icon(Icons.Default.AccountBalance, null) })
-    object Production : Screen("production", "生产管理", { Icon(Icons.Default.Factory, null) })
-    object Reports : Screen("reports", "报表统计", { Icon(Icons.Default.BarChart, null) })
+    object Dashboard : Screen("dashboard", "Home", { Icon(Icons.Default.Home, null) })
+    object Products : Screen("products", "Products", { Icon(Icons.Default.Inventory, null) })
+    object Customers : Screen("customers", "Customers", { Icon(Icons.Default.People, null) })
+    object Suppliers : Screen("suppliers", "Suppliers", { Icon(Icons.Default.LocalShipping, null) })
+    object Purchase : Screen("purchase", "Purchase", { Icon(Icons.Default.ShoppingCart, null) })
+    object Sales : Screen("sales", "Sales", { Icon(Icons.Default.PointOfSale, null) })
+    object Inventory : Screen("inventory", "Inventory", { Icon(Icons.Default.Warehouse, null) })
+    object Finance : Screen("finance", "Finance", { Icon(Icons.Default.AccountBalance, null) })
+    object Production : Screen("production", "Production", { Icon(Icons.Default.Factory, null) })
+    object Reports : Screen("reports", "Reports", { Icon(Icons.Default.BarChart, null) })
 }
 
 val screens = listOf(
@@ -43,7 +45,7 @@ val screens = listOf(
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    var drawerState = rememberDrawerState(DrawerValue.Closed)
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
@@ -63,7 +65,7 @@ fun MainScreen() {
                     },
                     navigationIcon = {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
-                            Icon(Icons.Default.Menu, contentDescription = "菜单")
+                            Icon(Icons.Default.Menu, contentDescription = "Menu")
                         }
                     }
                 )
@@ -98,38 +100,32 @@ fun NavigationDrawerContent(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    "SimpleERP",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp)
-                )
-                Divider()
-                screens.forEach { screen ->
-                    NavigationDrawerItem(
-                        icon = screen.icon,
-                        label = { Text(screen.title) },
-                        selected = currentRoute == screen.route,
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
+    ModalDrawerSheet {
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "SimpleERP",
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(16.dp)
+        )
+        HorizontalDivider()
+        screens.forEach { screen ->
+            NavigationDrawerItem(
+                icon = screen.icon,
+                label = { Text(screen.title) },
+                selected = currentRoute == screen.route,
+                onClick = {
+                    scope.launch {
+                        drawerState.close()
+                        navController.navigate(screen.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
                             }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                    )
+                    }
                 }
-            }
-        },
-        content = {}
-    )
+            )
+        }
+    }
 }
