@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Environment
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -14,15 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import com.example.simpleerp.SimpleERPApplication
 import com.example.simpleerp.entity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.apache.poi.ss.usermodel.*
-import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -47,10 +43,10 @@ fun ReportScreen() {
     var exportMessage by remember { mutableStateOf("") }
 
     val reportTypes = listOf(
-        "sales" to "销售报表",
-        "purchase" to "采购报表",
-        "finance" to "财务报表",
-        "inventory" to "库存报表"
+        "sales" to "閿€鍞姤琛?,
+        "purchase" to "閲囪喘鎶ヨ〃",
+        "finance" to "璐㈠姟鎶ヨ〃",
+        "inventory" to "搴撳瓨鎶ヨ〃"
     )
 
     LaunchedEffect(Unit) {
@@ -62,7 +58,6 @@ fun ReportScreen() {
 
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
-    // Calculate statistics
     val filteredSales = salesOrders.filter { 
         it.orderDate in startDate..endDate && it.status != "cancelled"
     }
@@ -86,14 +81,13 @@ fun ReportScreen() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text("报表统计", style = MaterialTheme.typography.headlineMedium)
+            Text("鎶ヨ〃缁熻", style = MaterialTheme.typography.headlineMedium)
         }
 
-        // Date Range Selection
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("日期范围", style = MaterialTheme.typography.titleMedium)
+                    Text("鏃ユ湡鑼冨洿", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -106,7 +100,7 @@ fun ReportScreen() {
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("近7天")
+                            Text("杩?澶?)
                         }
                         OutlinedButton(
                             onClick = {
@@ -115,7 +109,7 @@ fun ReportScreen() {
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("近30天")
+                            Text("杩?0澶?)
                         }
                         OutlinedButton(
                             onClick = {
@@ -124,20 +118,19 @@ fun ReportScreen() {
                             },
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("本年")
+                            Text("鏈勾")
                         }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("从: ${dateFormat.format(Date(startDate))} 到: ${dateFormat.format(Date(endDate))}")
+                    Text("浠? ${dateFormat.format(Date(startDate))} 鍒? ${dateFormat.format(Date(endDate))}")
                 }
             }
         }
 
-        // Report Type Selection
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("报表类型", style = MaterialTheme.typography.titleMedium)
+                    Text("鎶ヨ〃绫诲瀷", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -155,49 +148,46 @@ fun ReportScreen() {
             }
         }
 
-        // Statistics based on selected report type
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        reportTypes.find { it.first == selectedReportType }?.second ?: "报表",
+                        reportTypes.find { it.first == selectedReportType }?.second ?: "鎶ヨ〃",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     when (selectedReportType) {
                         "sales" -> {
-                            StatRow("销售订单数", "${filteredSales.size}")
-                            StatRow("销售总额", "¥${String.format("%.2f", totalSales)}")
-                            StatRow("平均订单金额", "¥${if (filteredSales.isNotEmpty()) String.format("%.2f", totalSales / filteredSales.size) else "0.00"}")
+                            StatRow("閿€鍞鍗曟暟", "${filteredSales.size}")
+                            StatRow("閿€鍞€婚", "楼${String.format("%.2f", totalSales)}")
+                            StatRow("骞冲潎璁㈠崟閲戦", "楼${if (filteredSales.isNotEmpty()) String.format("%.2f", totalSales / filteredSales.size) else "0.00"}")
                         }
                         "purchase" -> {
-                            StatRow("采购订单数", "${filteredPurchase.size}")
-                            StatRow("采购总额", "¥${String.format("%.2f", totalPurchase)}")
-                            StatRow("平均订单金额", "¥${if (filteredPurchase.isNotEmpty()) String.format("%.2f", totalPurchase / filteredPurchase.size) else "0.00"}")
+                            StatRow("閲囪喘璁㈠崟鏁?, "${filteredPurchase.size}")
+                            StatRow("閲囪喘鎬婚", "楼${String.format("%.2f", totalPurchase)}")
+                            StatRow("骞冲潎璁㈠崟閲戦", "楼${if (filteredPurchase.isNotEmpty()) String.format("%.2f", totalPurchase / filteredPurchase.size) else "0.00"}")
                         }
                         "finance" -> {
-                            StatRow("总收入", "¥${String.format("%.2f", totalIncome)}")
-                            StatRow("总支出", "¥${String.format("%.2f", totalExpense)}")
-                            StatRow("净利润", "¥${String.format("%.2f", profit)}")
+                            StatRow("鎬绘敹鍏?, "楼${String.format("%.2f", totalIncome)}")
+                            StatRow("鎬绘敮鍑?, "楼${String.format("%.2f", totalExpense)}")
+                            StatRow("鍑€鍒╂鼎", "楼${String.format("%.2f", profit)}")
                         }
                         "inventory" -> {
-                            val totalValue = inventory.sumOf { it.quantity * (it.quantity * 10) } // Simplified
-                            StatRow("库存商品数", "${inventory.size}")
-                            StatRow("库存总量", "${inventory.sumOf { it.quantity }}")
+                            StatRow("搴撳瓨鍟嗗搧鏁?, "${inventory.size}")
+                            StatRow("搴撳瓨鎬婚噺", "${inventory.sumOf { it.quantity }}")
                             val lowStock = inventory.filter { it.quantity <= it.minStock }.size
-                            StatRow("低库存商品数", "$lowStock")
+                            StatRow("浣庡簱瀛樺晢鍝佹暟", "$lowStock")
                         }
                     }
                 }
             }
         }
 
-        // Export Buttons
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("导出报表", style = MaterialTheme.typography.titleMedium)
+                    Text("瀵煎嚭鎶ヨ〃", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     if (exportMessage.isNotEmpty()) {
@@ -205,69 +195,34 @@ fun ReportScreen() {
                         Spacer(modifier = Modifier.height(8.dp))
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                isExporting = true
+                                try {
+                                    val file = exportToCSV(
+                                        context,
+                                        selectedReportType,
+                                        startDate,
+                                        endDate,
+                                        salesOrders,
+                                        purchaseOrders,
+                                        transactions,
+                                        inventory
+                                    )
+                                    exportMessage = "宸插鍑? ${file.name}"
+                                } catch (e: Exception) {
+                                    exportMessage = "瀵煎嚭澶辫触: ${e.message}"
+                                }
+                                isExporting = false
+                            }
+                        },
+                        enabled = !isExporting,
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Button(
-                            onClick = {
-                                scope.launch {
-                                    isExporting = true
-                                    try {
-                                        val file = exportToExcel(
-                                            context,
-                                            selectedReportType,
-                                            startDate,
-                                            endDate,
-                                            salesOrders,
-                                            purchaseOrders,
-                                            transactions,
-                                            inventory
-                                        )
-                                        exportMessage = "已导出: ${file.name}"
-                                    } catch (e: Exception) {
-                                        exportMessage = "导出失败: ${e.message}"
-                                    }
-                                    isExporting = false
-                                }
-                            },
-                            enabled = !isExporting,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(Icons.Default.FileExcel, null)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("导出Excel")
-                        }
-
-                        Button(
-                            onClick = {
-                                scope.launch {
-                                    isExporting = true
-                                    try {
-                                        val file = exportToPdf(
-                                            context,
-                                            selectedReportType,
-                                            startDate,
-                                            endDate,
-                                            salesOrders,
-                                            purchaseOrders,
-                                            transactions,
-                                            inventory
-                                        )
-                                        exportMessage = "已导出: ${file.name}"
-                                    } catch (e: Exception) {
-                                        exportMessage = "导出失败: ${e.message}"
-                                    }
-                                    isExporting = false
-                                }
-                            },
-                            enabled = !isExporting,
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Icon(Icons.Default.PictureAsPdf, null)
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text("导出PDF")
-                        }
+                        Icon(Icons.Default.Download, null)
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text("瀵煎嚭CSV鎶ヨ〃")
                     }
                 }
             }
@@ -288,99 +243,7 @@ fun StatRow(label: String, value: String) {
     }
 }
 
-suspend fun exportToExcel(
-    context: Context,
-    reportType: String,
-    startDate: Long,
-    endDate: Long,
-    salesOrders: List<SalesOrder>,
-    purchaseOrders: List<PurchaseOrder>,
-    transactions: List<Transaction>,
-    inventory: List<Inventory>
-): File = withContext(Dispatchers.IO) {
-    val workbook = XSSFWorkbook()
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-
-    when (reportType) {
-        "sales" -> {
-            val sheet = workbook.createSheet("销售报表")
-            val header = sheet.createRow(0)
-            header.createCell(0).setCellValue("订单号")
-            header.createCell(1).setCellValue("日期")
-            header.createCell(2).setCellValue("金额")
-            header.createCell(3).setCellValue("状态")
-
-            val filtered = salesOrders.filter { it.orderDate in startDate..endDate }
-            filtered.forEachIndexed { index, order ->
-                val row = sheet.createRow(index + 1)
-                row.createCell(0).setCellValue(order.orderNo)
-                row.createCell(1).setCellValue(dateFormat.format(Date(order.orderDate)))
-                row.createCell(2).setCellValue(order.totalAmount)
-                row.createCell(3).setCellValue(order.status)
-            }
-        }
-        "purchase" -> {
-            val sheet = workbook.createSheet("采购报表")
-            val header = sheet.createRow(0)
-            header.createCell(0).setCellValue("订单号")
-            header.createCell(1).setCellValue("日期")
-            header.createCell(2).setCellValue("金额")
-            header.createCell(3).setCellValue("状态")
-
-            val filtered = purchaseOrders.filter { it.orderDate in startDate..endDate }
-            filtered.forEachIndexed { index, order ->
-                val row = sheet.createRow(index + 1)
-                row.createCell(0).setCellValue(order.orderNo)
-                row.createCell(1).setCellValue(dateFormat.format(Date(order.orderDate)))
-                row.createCell(2).setCellValue(order.totalAmount)
-                row.createCell(3).setCellValue(order.status)
-            }
-        }
-        "finance" -> {
-            val sheet = workbook.createSheet("财务报表")
-            val header = sheet.createRow(0)
-            header.createCell(0).setCellValue("日期")
-            header.createCell(1).setCellValue("账户")
-            header.createCell(2).setCellValue("类型")
-            header.createCell(3).setCellValue("金额")
-            header.createCell(4).setCellValue("分类")
-
-            val filtered = transactions.filter { it.transactionDate in startDate..endDate }
-            filtered.forEachIndexed { index, tx ->
-                val row = sheet.createRow(index + 1)
-                row.createCell(0).setCellValue(dateFormat.format(Date(tx.transactionDate)))
-                row.createCell(1).setCellValue(tx.accountName)
-                row.createCell(2).setCellValue(if (tx.type == "income") "收入" else "支出")
-                row.createCell(3).setCellValue(tx.amount)
-                row.createCell(4).setCellValue(tx.category)
-            }
-        }
-        "inventory" -> {
-            val sheet = workbook.createSheet("库存报表")
-            val header = sheet.createRow(0)
-            header.createCell(0).setCellValue("商品名称")
-            header.createCell(1).setCellValue("仓库")
-            header.createCell(2).setCellValue("库存数量")
-            header.createCell(3).setCellValue("最低库存")
-
-            inventory.forEachIndexed { index, item ->
-                val row = sheet.createRow(index + 1)
-                row.createCell(0).setCellValue(item.productName)
-                row.createCell(1).setCellValue(item.warehouse)
-                row.createCell(2).setCellValue(item.quantity)
-                row.createCell(3).setCellValue(item.minStock)
-            }
-        }
-    }
-
-    val fileName = "ERP_${reportType}_${System.currentTimeMillis()}.xlsx"
-    val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
-    FileOutputStream(file).use { workbook.write(it) }
-    workbook.close()
-    file
-}
-
-suspend fun exportToPdf(
+suspend fun exportToCSV(
     context: Context,
     reportType: String,
     startDate: Long,
@@ -391,76 +254,51 @@ suspend fun exportToPdf(
     inventory: List<Inventory>
 ): File = withContext(Dispatchers.IO) {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    
-    val fileName = "ERP_${reportType}_${System.currentTimeMillis()}.pdf"
+    val fileName = "ERP_${reportType}_${System.currentTimeMillis()}.csv"
     val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
     
-    // Simple text-based PDF export (in production, use iText7)
     val content = buildString {
-        appendLine("=".repeat(50))
-        appendLine("ERP ${getReportTitle(reportType)}")
-        appendLine("日期范围: ${dateFormat.format(Date(startDate))} - ${dateFormat.format(Date(endDate))}")
-        appendLine("=".repeat(50))
-        appendLine()
-        
         when (reportType) {
             "sales" -> {
-                val filtered = salesOrders.filter { it.orderDate in startDate..endDate && it.status != "cancelled" }
-                appendLine("销售订单数: ${filtered.size}")
-                appendLine("销售总额: ¥${String.format("%.2f", filtered.sumOf { it.totalAmount })}")
-                appendLine()
-                appendLine("订单明细:")
+                appendLine("璁㈠崟鍙?鏃ユ湡,閲戦,鐘舵€?)
+                val filtered = salesOrders.filter { it.orderDate in startDate..endDate }
                 filtered.forEach { order ->
-                    appendLine("  ${order.orderNo} | ${dateFormat.format(Date(order.orderDate))} | ¥${order.totalAmount} | ${order.status}")
+                    appendLine("${order.orderNo},${dateFormat.format(Date(order.orderDate))},${order.totalAmount},${order.status}")
                 }
+                appendLine()
+                appendLine("鎬昏,,${filtered.sumOf { it.totalAmount }},")
             }
             "purchase" -> {
-                val filtered = purchaseOrders.filter { it.orderDate in startDate..endDate && it.status != "cancelled" }
-                appendLine("采购订单数: ${filtered.size}")
-                appendLine("采购总额: ¥${String.format("%.2f", filtered.sumOf { it.totalAmount })}")
-                appendLine()
-                appendLine("订单明细:")
+                appendLine("璁㈠崟鍙?鏃ユ湡,閲戦,鐘舵€?)
+                val filtered = purchaseOrders.filter { it.orderDate in startDate..endDate }
                 filtered.forEach { order ->
-                    appendLine("  ${order.orderNo} | ${dateFormat.format(Date(order.orderDate))} | ¥${order.totalAmount} | ${order.status}")
+                    appendLine("${order.orderNo},${dateFormat.format(Date(order.orderDate))},${order.totalAmount},${order.status}")
                 }
+                appendLine()
+                appendLine("鎬昏,,${filtered.sumOf { it.totalAmount }},")
             }
             "finance" -> {
+                appendLine("鏃ユ湡,璐︽埛,绫诲瀷,閲戦,鍒嗙被")
                 val filtered = transactions.filter { it.transactionDate in startDate..endDate }
+                filtered.forEach { tx ->
+                    appendLine("${dateFormat.format(Date(tx.transactionDate))},${tx.accountName},${if(tx.type=="income")"鏀跺叆" else "鏀嚭"},${tx.amount},${tx.category}")
+                }
                 val income = filtered.filter { it.type == "income" }.sumOf { it.amount }
                 val expense = filtered.filter { it.type == "expense" }.sumOf { it.amount }
-                appendLine("总收入: ¥${String.format("%.2f", income)}")
-                appendLine("总支出: ¥${String.format("%.2f", expense)}")
-                appendLine("净利润: ¥${String.format("%.2f", income - expense)}")
                 appendLine()
-                appendLine("交易明细:")
-                filtered.forEach { tx ->
-                    val typeLabel = if (tx.type == "income") "收入" else "支出"
-                    appendLine("  ${dateFormat.format(Date(tx.transactionDate))} | ${tx.accountName} | $typeLabel | ¥${tx.amount} | ${tx.category}")
-                }
+                appendLine("鎬绘敹鍏?,,${income},")
+                appendLine("鎬绘敮鍑?,,${expense},")
+                appendLine("鍑€鍒╂鼎,,,${income - expense},")
             }
             "inventory" -> {
-                appendLine("库存商品数: ${inventory.size}")
-                appendLine("库存总量: ${inventory.sumOf { it.quantity }}")
-                val lowStock = inventory.filter { it.quantity <= it.minStock }.size
-                appendLine("低库存商品数: $lowStock")
-                appendLine()
-                appendLine("库存明细:")
+                appendLine("鍟嗗搧鍚嶇О,浠撳簱,搴撳瓨鏁伴噺,鏈€浣庡簱瀛?)
                 inventory.forEach { item ->
-                    appendLine("  ${item.productName} | ${item.warehouse} | ${item.quantity} | 最低: ${item.minStock}")
+                    appendLine("${item.productName},${item.warehouse},${item.quantity},${item.minStock}")
                 }
             }
         }
     }
     
-    // Write as text file (for actual PDF, integrate iText7 properly)
-    file.writeText(content)
+    file.writeText(content, Charsets.UTF_8)
     file
-}
-
-fun getReportTitle(type: String): String = when (type) {
-    "sales" -> "销售报表"
-    "purchase" -> "采购报表"
-    "finance" -> "财务报表"
-    "inventory" -> "库存报表"
-    else -> "报表"
 }
