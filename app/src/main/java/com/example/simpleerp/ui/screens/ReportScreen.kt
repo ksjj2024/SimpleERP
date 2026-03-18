@@ -1,7 +1,6 @@
 package com.example.simpleerp.ui.screens
 
 import android.content.Context
-import android.content.Intent
 import android.os.Environment
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,10 +41,10 @@ fun ReportScreen() {
     var exportMessage by remember { mutableStateOf("") }
 
     val reportTypes = listOf(
-        "sales" to "閿€鍞姤琛?,
-        "purchase" to "閲囪喘鎶ヨ〃",
-        "finance" to "璐㈠姟鎶ヨ〃",
-        "inventory" to "搴撳瓨鎶ヨ〃"
+        "sales" to "Sales Report",
+        "purchase" to "Purchase Report",
+        "finance" to "Finance Report",
+        "inventory" to "Inventory Report"
     )
 
     LaunchedEffect(Unit) {
@@ -81,13 +79,13 @@ fun ReportScreen() {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-            Text("鎶ヨ〃缁熻", style = MaterialTheme.typography.headlineMedium)
+            Text("Reports", style = MaterialTheme.typography.headlineMedium)
         }
 
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("鏃ユ湡鑼冨洿", style = MaterialTheme.typography.titleMedium)
+                    Text("Date Range", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -99,30 +97,24 @@ fun ReportScreen() {
                                 endDate = System.currentTimeMillis()
                             },
                             modifier = Modifier.weight(1f)
-                        ) {
-                            Text("杩?澶?)
-                        }
+                        ) { Text("7 Days") }
                         OutlinedButton(
                             onClick = {
                                 startDate = System.currentTimeMillis() - 30L * 24 * 60 * 60 * 1000
                                 endDate = System.currentTimeMillis()
                             },
                             modifier = Modifier.weight(1f)
-                        ) {
-                            Text("杩?0澶?)
-                        }
+                        ) { Text("30 Days") }
                         OutlinedButton(
                             onClick = {
                                 startDate = System.currentTimeMillis() - 365L * 24 * 60 * 60 * 1000
                                 endDate = System.currentTimeMillis()
                             },
                             modifier = Modifier.weight(1f)
-                        ) {
-                            Text("鏈勾")
-                        }
+                        ) { Text("1 Year") }
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("浠? ${dateFormat.format(Date(startDate))} 鍒? ${dateFormat.format(Date(endDate))}")
+                    Text("From: ${dateFormat.format(Date(startDate))} To: ${dateFormat.format(Date(endDate))}")
                 }
             }
         }
@@ -130,7 +122,7 @@ fun ReportScreen() {
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("鎶ヨ〃绫诲瀷", style = MaterialTheme.typography.titleMedium)
+                    Text("Report Type", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -152,32 +144,32 @@ fun ReportScreen() {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
-                        reportTypes.find { it.first == selectedReportType }?.second ?: "鎶ヨ〃",
+                        reportTypes.find { it.first == selectedReportType }?.second ?: "Report",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Spacer(modifier = Modifier.height(16.dp))
 
                     when (selectedReportType) {
                         "sales" -> {
-                            StatRow("閿€鍞鍗曟暟", "${filteredSales.size}")
-                            StatRow("閿€鍞€婚", "楼${String.format("%.2f", totalSales)}")
-                            StatRow("骞冲潎璁㈠崟閲戦", "楼${if (filteredSales.isNotEmpty()) String.format("%.2f", totalSales / filteredSales.size) else "0.00"}")
+                            StatRow("Orders", "${filteredSales.size}")
+                            StatRow("Total", "$${String.format("%.2f", totalSales)}")
+                            StatRow("Average", "$${if (filteredSales.isNotEmpty()) String.format("%.2f", totalSales / filteredSales.size) else "0.00"}")
                         }
                         "purchase" -> {
-                            StatRow("閲囪喘璁㈠崟鏁?, "${filteredPurchase.size}")
-                            StatRow("閲囪喘鎬婚", "楼${String.format("%.2f", totalPurchase)}")
-                            StatRow("骞冲潎璁㈠崟閲戦", "楼${if (filteredPurchase.isNotEmpty()) String.format("%.2f", totalPurchase / filteredPurchase.size) else "0.00"}")
+                            StatRow("Orders", "${filteredPurchase.size}")
+                            StatRow("Total", "$${String.format("%.2f", totalPurchase)}")
+                            StatRow("Average", "$${if (filteredPurchase.isNotEmpty()) String.format("%.2f", totalPurchase / filteredPurchase.size) else "0.00"}")
                         }
                         "finance" -> {
-                            StatRow("鎬绘敹鍏?, "楼${String.format("%.2f", totalIncome)}")
-                            StatRow("鎬绘敮鍑?, "楼${String.format("%.2f", totalExpense)}")
-                            StatRow("鍑€鍒╂鼎", "楼${String.format("%.2f", profit)}")
+                            StatRow("Income", "$${String.format("%.2f", totalIncome)}")
+                            StatRow("Expense", "$${String.format("%.2f", totalExpense)}")
+                            StatRow("Profit", "$${String.format("%.2f", profit)}")
                         }
                         "inventory" -> {
-                            StatRow("搴撳瓨鍟嗗搧鏁?, "${inventory.size}")
-                            StatRow("搴撳瓨鎬婚噺", "${inventory.sumOf { it.quantity }}")
+                            StatRow("Products", "${inventory.size}")
+                            StatRow("Total Qty", "${inventory.sumOf { it.quantity }}")
                             val lowStock = inventory.filter { it.quantity <= it.minStock }.size
-                            StatRow("浣庡簱瀛樺晢鍝佹暟", "$lowStock")
+                            StatRow("Low Stock", "$lowStock")
                         }
                     }
                 }
@@ -187,7 +179,7 @@ fun ReportScreen() {
         item {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("瀵煎嚭鎶ヨ〃", style = MaterialTheme.typography.titleMedium)
+                    Text("Export", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     if (exportMessage.isNotEmpty()) {
@@ -210,9 +202,9 @@ fun ReportScreen() {
                                         transactions,
                                         inventory
                                     )
-                                    exportMessage = "宸插鍑? ${file.name}"
+                                    exportMessage = "Exported: ${file.name}"
                                 } catch (e: Exception) {
-                                    exportMessage = "瀵煎嚭澶辫触: ${e.message}"
+                                    exportMessage = "Error: ${e.message}"
                                 }
                                 isExporting = false
                             }
@@ -222,7 +214,7 @@ fun ReportScreen() {
                     ) {
                         Icon(Icons.Default.Download, null)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("瀵煎嚭CSV鎶ヨ〃")
+                        Text("Export CSV")
                     }
                 }
             }
@@ -260,38 +252,29 @@ suspend fun exportToCSV(
     val content = buildString {
         when (reportType) {
             "sales" -> {
-                appendLine("璁㈠崟鍙?鏃ユ湡,閲戦,鐘舵€?)
+                appendLine("OrderNo,Date,Amount,Status")
                 val filtered = salesOrders.filter { it.orderDate in startDate..endDate }
                 filtered.forEach { order ->
                     appendLine("${order.orderNo},${dateFormat.format(Date(order.orderDate))},${order.totalAmount},${order.status}")
                 }
-                appendLine()
-                appendLine("鎬昏,,${filtered.sumOf { it.totalAmount }},")
             }
             "purchase" -> {
-                appendLine("璁㈠崟鍙?鏃ユ湡,閲戦,鐘舵€?)
+                appendLine("OrderNo,Date,Amount,Status")
                 val filtered = purchaseOrders.filter { it.orderDate in startDate..endDate }
                 filtered.forEach { order ->
                     appendLine("${order.orderNo},${dateFormat.format(Date(order.orderDate))},${order.totalAmount},${order.status}")
                 }
-                appendLine()
-                appendLine("鎬昏,,${filtered.sumOf { it.totalAmount }},")
             }
             "finance" -> {
-                appendLine("鏃ユ湡,璐︽埛,绫诲瀷,閲戦,鍒嗙被")
+                appendLine("Date,Account,Type,Amount,Category")
                 val filtered = transactions.filter { it.transactionDate in startDate..endDate }
                 filtered.forEach { tx ->
-                    appendLine("${dateFormat.format(Date(tx.transactionDate))},${tx.accountName},${if(tx.type=="income")"鏀跺叆" else "鏀嚭"},${tx.amount},${tx.category}")
+                    val typeLabel = if (tx.type == "income") "Income" else "Expense"
+                    appendLine("${dateFormat.format(Date(tx.transactionDate))},${tx.accountName},$typeLabel,${tx.amount},${tx.category}")
                 }
-                val income = filtered.filter { it.type == "income" }.sumOf { it.amount }
-                val expense = filtered.filter { it.type == "expense" }.sumOf { it.amount }
-                appendLine()
-                appendLine("鎬绘敹鍏?,,${income},")
-                appendLine("鎬绘敮鍑?,,${expense},")
-                appendLine("鍑€鍒╂鼎,,,${income - expense},")
             }
             "inventory" -> {
-                appendLine("鍟嗗搧鍚嶇О,浠撳簱,搴撳瓨鏁伴噺,鏈€浣庡簱瀛?)
+                appendLine("Product,Warehouse,Quantity,MinStock")
                 inventory.forEach { item ->
                     appendLine("${item.productName},${item.warehouse},${item.quantity},${item.minStock}")
                 }
