@@ -45,7 +45,7 @@ fun DashboardScreen(navController: NavHostController) {
     ) {
         item {
             Text(
-                "Welcome to SimpleERP",
+                "Welcome to SimpleERP ",
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
