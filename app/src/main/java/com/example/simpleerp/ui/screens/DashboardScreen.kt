@@ -10,9 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import com.example.simpleerp.SimpleERPApplication
+import com.example.simpleerp.entity.Product
+import com.example.simpleerp.entity.Customer
+import com.example.simpleerp.entity.Inventory
+import com.example.simpleerp.entity.SalesOrder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -42,7 +45,7 @@ fun DashboardScreen(navController: NavHostController) {
     ) {
         item {
             Text(
-                "娆㈣繋浣跨敤 SimpleERP",
+                "Welcome to SimpleERP",
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -54,14 +57,14 @@ fun DashboardScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DashboardCard(
-                    title = "鍟嗗搧鏁伴噺",
+                    title = "Products",
                     value = productCount.toString(),
                     icon = Icons.Default.Inventory,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("products") }
                 )
                 DashboardCard(
-                    title = "瀹㈡埛鏁伴噺",
+                    title = "Customers",
                     value = customerCount.toString(),
                     icon = Icons.Default.People,
                     modifier = Modifier.weight(1f),
@@ -76,15 +79,15 @@ fun DashboardScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 DashboardCard(
-                    title = "搴撳瓨鍟嗗搧",
+                    title = "Inventory",
                     value = inventoryCount.toString(),
                     icon = Icons.Default.Warehouse,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("inventory") }
                 )
                 DashboardCard(
-                    title = "閿€鍞€婚",
-                    value = "楼${String.format("%.2f", totalSales)}",
+                    title = "Sales",
+                    value = "$${String.format("%.2f", totalSales)}",
                     icon = Icons.Default.AttachMoney,
                     modifier = Modifier.weight(1f),
                     onClick = { navController.navigate("sales") }
@@ -94,7 +97,7 @@ fun DashboardScreen(navController: NavHostController) {
 
         item {
             Text(
-                "蹇嵎鎿嶄綔",
+                "Quick Actions",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -106,7 +109,7 @@ fun DashboardScreen(navController: NavHostController) {
 
         item {
             Text(
-                "绯荤粺淇℃伅",
+                "System Info",
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 16.dp)
             )
@@ -118,8 +121,8 @@ fun DashboardScreen(navController: NavHostController) {
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("SimpleERP v1.0")
-                    Text("鍗曟満鐗?- 鏁版嵁瀛樺偍鍦ㄦ湰鍦?)
-                    Text("鏀寔锛氳繘閿€瀛樸€佽储鍔°€佺敓浜с€佹姤琛?)
+                    Text("Offline ERP System")
+                    Text("Features: Sales, Purchase, Inventory, Finance, Production, Reports")
                 }
             }
         }
@@ -156,12 +159,12 @@ fun DashboardCard(
 @Composable
 fun QuickActionGrid(navController: NavHostController) {
     val actions = listOf(
-        Triple("鏂板缓閲囪喘", Icons.Default.ShoppingCart) { navController.navigate("purchase") },
-        Triple("鏂板缓閿€鍞?, Icons.Default.PointOfSale) { navController.navigate("sales") },
-        Triple("娣诲姞鍟嗗搧", Icons.Default.Add) { navController.navigate("products") },
-        Triple("娣诲姞瀹㈡埛", Icons.Default.PersonAdd) { navController.navigate("customers") },
-        Triple("搴撳瓨鏌ヨ", Icons.Default.Search) { navController.navigate("inventory") },
-        Triple("璐㈠姟鎶ヨ〃", Icons.Default.BarChart) { navController.navigate("reports") }
+        Pair("New Purchase") { navController.navigate("purchase") },
+        Pair("New Sale") { navController.navigate("sales") },
+        Pair("Add Product") { navController.navigate("products") },
+        Pair("Add Customer") { navController.navigate("customers") },
+        Pair("Check Inventory") { navController.navigate("inventory") },
+        Pair("View Reports") { navController.navigate("reports") }
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -169,29 +172,27 @@ fun QuickActionGrid(navController: NavHostController) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            actions.take(3).forEach { (title, icon, onClick) ->
-                QuickActionButton(title, icon, onClick, Modifier.weight(1f))
+            actions.take(3).forEach { (title, onClick) ->
+                QuickActionButton(title, onClick, Modifier.weight(1f))
             }
         }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            actions.drop(3).forEach { (title, icon, onClick) ->
-                QuickActionButton(title, icon, onClick, Modifier.weight(1f))
+            actions.drop(3).forEach { (title, onClick) ->
+                QuickActionButton(title, onClick, Modifier.weight(1f))
             }
         }
     }
 }
 
 @Composable
-fun QuickActionButton(title: String, icon: ImageVector, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun QuickActionButton(title: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-        Spacer(modifier = Modifier.width(4.dp))
         Text(title)
     }
 }
