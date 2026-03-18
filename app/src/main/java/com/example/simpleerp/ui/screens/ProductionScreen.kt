@@ -164,7 +164,7 @@ fun AddProductionOrderDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("New Production Order") },
+        title = { Text("New Production Order ") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
