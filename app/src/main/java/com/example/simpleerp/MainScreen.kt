@@ -107,7 +107,7 @@ fun NavigationDrawerContent(
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(16.dp)
         )
-        HorizontalDivider()
+        Divider()
         screens.forEach { screen ->
             NavigationDrawerItem(
                 icon = screen.icon,
