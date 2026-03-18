@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "SimpleERP"
-include ':app'
+include(":app")
